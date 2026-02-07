@@ -1,0 +1,51 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="S3Explorer.App"
+             RequestedThemeVariant="Light">
+    <Application.Resources>
+        <ResourceDictionary>
+            <StreamGeometry x:Key="IconAdd">M7,1 L9,1 9,7 15,7 15,9 9,9 9,15 7,15 7,9 1,9 1,7 7,7 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconEdit">M13,0 L16,3 5.5,13.5 2,14 2.5,10.5 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconRemove">M2.6,1 L8,6.4 13.4,1 15,2.6 9.6,8 15,13.4 13.4,15 8,9.6 2.6,15 1,13.4 6.4,8 1,2.6 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconReconnect">M0,3 L0,5 10,5 10,8 16,4 10,0 10,3 Z M16,13 L16,11 6,11 6,8 0,12 6,16 6,13 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconTheme">M8,0 A8,8,0,0,0,8,16 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconRefresh">M14,8 A6,6,0,0,0,2,8 L0,11 L4,8 A4,4,0,0,0,12,8 Z M2,8 A6,6,0,0,1,14,8 L16,5 L12,8 A4,4,0,0,1,4,8 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconUp">M8,1 L15,8 11,8 11,15 5,15 5,8 1,8 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconUpload">M8,0 L13,5 10,5 10,10 6,10 6,5 3,5 Z M1,12 L15,12 15,15 1,15 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconClear">M5,1 L11,1 11,3 14,3 14,5 13,5 12,15 4,15 3,5 2,5 2,3 5,3 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconCopy">M4,0 L16,0 16,12 4,12 Z M0,4 L12,4 12,16 0,16 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconSave">M0,0 L12,0 16,4 16,16 0,16 Z M4,0 L4,6 11,6 11,0 Z M4,9 L4,15 12,15 12,9 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconCheck">M0,8.8 L1.6,7.2 6,11.6 14.4,3.2 16,4.8 6,14.8 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconShield">M8,1 L15,4 14,11 8,15 2,11 1,4 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconMinus">M1,6 L15,6 15,10 1,10 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconClose">M2.6,1 L8,6.4 13.4,1 15,2.6 9.6,8 15,13.4 13.4,15 8,9.6 2.6,15 1,13.4 6.4,8 1,2.6 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconFolder">M0,2 L6,2 8,0 16,0 16,14 0,14 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconFile">M1,0 L10,0 15,5 15,16 1,16 Z M10,0 L10,5 15,5</StreamGeometry>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <!-- Warm neutral grays for selection highlights in light mode -->
+                    <SolidColorBrush x:Key="ListBoxItemBackgroundSelected" Color="#E8E6E3"/>
+                    <SolidColorBrush x:Key="ListBoxItemBackgroundSelectedPointerOver" Color="#DEDBD7"/>
+                    <SolidColorBrush x:Key="ListBoxItemBackgroundPressed" Color="#DEDBD7"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <!-- Warm neutral grays for selection highlights in dark mode -->
+                    <SolidColorBrush x:Key="ListBoxItemBackgroundSelected" Color="#3D3A37"/>
+                    <SolidColorBrush x:Key="ListBoxItemBackgroundSelectedPointerOver" Color="#4D4944"/>
+                    <SolidColorBrush x:Key="ListBoxItemBackgroundPressed" Color="#4D4944"/>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <!-- Override DataGrid row selection colors -->
+        <Style Selector="DataGridRow:selected">
+            <Setter Property="Background" Value="{DynamicResource ListBoxItemBackgroundSelected}"/>
+        </Style>
+        <Style Selector="DataGridRow:selected:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ListBoxItemBackgroundSelectedPointerOver}"/>
+        </Style>
+    </Application.Styles>
+</Application>

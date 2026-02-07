@@ -1,0 +1,65 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="S3Explorer.Views.AclDialog"
+        Title="Object ACL"
+        Width="560" Height="420"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+
+    <DockPanel Margin="16">
+        <!-- Bottom Buttons -->
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
+            <Button Width="160" Click="OnApplyCannedAcl" Classes="accent">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <PathIcon Data="{StaticResource IconShield}" Width="14" Height="14"/>
+                    <TextBlock Text="Apply Canned ACL" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Button Width="80" Click="OnClose">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <PathIcon Data="{StaticResource IconClose}" Width="14" Height="14"/>
+                    <TextBlock Text="Close" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <StackPanel Spacing="12">
+            <!-- Owner Info -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Owner" FontWeight="SemiBold"/>
+                <TextBlock x:Name="OwnerText" Opacity="0.8"/>
+            </StackPanel>
+
+            <!-- Canned ACL -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Set Canned ACL" FontWeight="SemiBold"/>
+                <ComboBox x:Name="CannedAclCombo" MinWidth="250">
+                    <ComboBoxItem Content="private" Tag="private"/>
+                    <ComboBoxItem Content="public-read" Tag="public-read"/>
+                    <ComboBoxItem Content="public-read-write" Tag="public-read-write"/>
+                    <ComboBoxItem Content="authenticated-read" Tag="authenticated-read"/>
+                    <ComboBoxItem Content="bucket-owner-read" Tag="bucket-owner-read"/>
+                    <ComboBoxItem Content="bucket-owner-full-control" Tag="bucket-owner-full-control"/>
+                </ComboBox>
+            </StackPanel>
+
+            <!-- Current Grants -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Current Grants" FontWeight="SemiBold"/>
+                <DataGrid x:Name="GrantsGrid"
+                          IsReadOnly="True"
+                          CanUserResizeColumns="True"
+                          GridLinesVisibility="Horizontal"
+                          HeadersVisibility="Column"
+                          Height="150">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Grantee" Binding="{Binding Grantee}" Width="2*"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding GranteeType}" Width="*"/>
+                        <DataGridTextColumn Header="Permission" Binding="{Binding Permission}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </StackPanel>
+    </DockPanel>
+</Window>

@@ -1,0 +1,60 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="S3Explorer.Views.TagsDialog"
+        Title="Object Tags"
+        Width="520" Height="420"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+
+    <DockPanel Margin="16">
+        <!-- Bottom Buttons -->
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
+            <Button Width="80" Click="OnSave" Classes="accent">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <PathIcon Data="{StaticResource IconSave}" Width="14" Height="14"/>
+                    <TextBlock Text="Save" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Button Width="80" Click="OnCancel">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <PathIcon Data="{StaticResource IconClose}" Width="14" Height="14"/>
+                    <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <!-- Add Tag Row -->
+        <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,8,*,8,Auto" Margin="0,8,0,0">
+            <TextBox Grid.Column="0" x:Name="NewKeyBox" Watermark="Key"/>
+            <TextBox Grid.Column="2" x:Name="NewValueBox" Watermark="Value"/>
+            <Button Grid.Column="4" Click="OnAddTag">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <PathIcon Data="{StaticResource IconAdd}" Width="14" Height="14"/>
+                    <TextBlock Text="Add" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- Tags Grid -->
+        <DockPanel>
+            <Button DockPanel.Dock="Top" Click="OnRemoveTag"
+                    HorizontalAlignment="Left" Margin="0,0,0,8">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <PathIcon Data="{StaticResource IconMinus}" Width="14" Height="14"/>
+                    <TextBlock Text="Remove Selected" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <DataGrid x:Name="TagsGrid"
+                      CanUserResizeColumns="True"
+                      GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column"
+                      IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Key" Binding="{Binding Key}" Width="*"/>
+                    <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+    </DockPanel>
+</Window>

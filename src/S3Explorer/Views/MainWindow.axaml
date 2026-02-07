@@ -1,0 +1,284 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:S3Explorer.ViewModels"
+        x:Class="S3Explorer.Views.MainWindow"
+        Title="S3 Explorer"
+        Width="1100" Height="700"
+        MinWidth="800" MinHeight="500"
+        WindowStartupLocation="CenterScreen"
+        Icon="/assets/icon.ico">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <DockPanel>
+        <!-- Toolbar -->
+        <Border DockPanel.Dock="Top" BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1" Padding="8,6">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <!-- Account Controls -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
+                    <Image Source="/assets/icon.png" Height="24" Width="24" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <TextBlock Text="Account:" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <ComboBox ItemsSource="{Binding Accounts}"
+                              SelectedItem="{Binding SelectedAccount}"
+                              MinWidth="200"
+                              PlaceholderText="Select an account...">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayName}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Button Command="{Binding AddAccountCommand}" ToolTip.Tip="Add Account">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <PathIcon Data="{StaticResource IconAdd}" Width="14" Height="14"/>
+                            <TextBlock Text="Add" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding EditAccountCommand}" ToolTip.Tip="Edit Account">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <PathIcon Data="{StaticResource IconEdit}" Width="14" Height="14"/>
+                            <TextBlock Text="Edit" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding RemoveAccountCommand}" ToolTip.Tip="Remove Account">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <PathIcon Data="{StaticResource IconRemove}" Width="14" Height="14"/>
+                            <TextBlock Text="Remove" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding ReconnectCommand}" ToolTip.Tip="Reconnect to selected account">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <PathIcon Data="{StaticResource IconReconnect}" Width="14" Height="14"/>
+                            <TextBlock Text="Reconnect" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- Refresh + Theme -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6">
+                    <Button Command="{Binding ToggleThemeCommand}" ToolTip.Tip="Toggle Dark/Light Mode">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <PathIcon Data="{StaticResource IconTheme}" Width="14" Height="14"/>
+                            <TextBlock Text="{Binding ThemeLabel}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding RefreshCommand}" ToolTip.Tip="Refresh">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <PathIcon Data="{StaticResource IconRefresh}" Width="14" Height="14"/>
+                            <TextBlock Text="Refresh" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Status Bar -->
+        <Border DockPanel.Dock="Bottom" Padding="8,2"
+                Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" Spacing="16">
+                <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center"/>
+                <ProgressBar IsIndeterminate="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                             Width="120" Height="4" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content + Activity Log -->
+        <Grid RowDefinitions="*,Auto,140">
+            <!-- Main Content: Bucket List + Object List -->
+            <Grid Grid.Row="0" ColumnDefinitions="220,Auto,*">
+            <!-- Bucket List -->
+            <DockPanel Grid.Column="0">
+                <Border DockPanel.Dock="Top" Padding="8,6"
+                        Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                        BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                        BorderThickness="0,0,0,1">
+                    <TextBlock Text="Buckets" FontWeight="SemiBold"/>
+                </Border>
+                <ListBox ItemsSource="{Binding Buckets}"
+                         SelectedItem="{Binding SelectedBucket}"
+                         x:Name="BucketList">
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Create Bucket..." Command="{Binding CreateBucketCommand}"/>
+                            <MenuItem Header="Delete Bucket" Command="{Binding DeleteBucketCommand}"/>
+                            <Separator/>
+                            <MenuItem Header="Refresh" Command="{Binding RefreshCommand}"/>
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                </ListBox>
+            </DockPanel>
+
+            <!-- Splitter -->
+            <GridSplitter Grid.Column="1" Width="4" ResizeDirection="Columns"
+                          Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"/>
+
+            <!-- Object List -->
+            <DockPanel Grid.Column="2">
+                <!-- Breadcrumb Navigation -->
+                <Border DockPanel.Dock="Top" Padding="8,6"
+                        Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                        BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                        BorderThickness="0,0,0,1">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Left"
+                                Command="{Binding GoUpCommand}"
+                                IsVisible="{Binding CanGoUp}"
+                                Margin="0,0,8,0"
+                                ToolTip.Tip="Go up one level">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <PathIcon Data="{StaticResource IconUp}" Width="14" Height="14"/>
+                                <TextBlock Text="Up" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button DockPanel.Dock="Right"
+                                Command="{Binding UploadObjectCommand}"
+                                IsVisible="{Binding HasBucketSelected}"
+                                Margin="8,0,0,0"
+                                ToolTip.Tip="Upload file(s)">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <PathIcon Data="{StaticResource IconUpload}" Width="14" Height="14"/>
+                                <TextBlock Text="Upload" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <ItemsControl ItemsSource="{Binding Breadcrumbs}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text=" / " VerticalAlignment="Center" Opacity="0.5"
+                                                   IsVisible="{Binding Prefix, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                                        <Button Content="{Binding Label}"
+                                                Command="{Binding DataContext.NavigateBreadcrumbCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Padding="2,0"
+                                                Background="Transparent"
+                                                FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </DockPanel>
+                </Border>
+
+                <!-- Object DataGrid -->
+                <DataGrid ItemsSource="{Binding Objects}"
+                          SelectedItem="{Binding SelectedObject}"
+                          IsReadOnly="True"
+                          CanUserResizeColumns="True"
+                          CanUserSortColumns="True"
+                          GridLinesVisibility="Horizontal"
+                          Background="Transparent"
+                          DragDrop.AllowDrop="True"
+                          x:Name="ObjectGrid"
+                          DoubleTapped="ObjectGrid_DoubleTapped">
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Create Directory..." Command="{Binding CreateDirectoryCommand}"/>
+                            <MenuItem Header="Upload File..." Command="{Binding UploadObjectCommand}"/>
+                            <MenuItem Header="Upload Directory..." Command="{Binding UploadDirectoryCommand}"/>
+                            <Separator/>
+                            <MenuItem Header="Open / Navigate" x:Name="OpenMenuItem"
+                                      Command="{Binding DoubleClickObjectCommand}"
+                                      CommandParameter="{Binding SelectedObject}"/>
+                            <MenuItem Header="Download..." Command="{Binding DownloadObjectCommand}"
+                                      CommandParameter="{Binding SelectedObject}"/>
+                            <Separator/>
+                            <MenuItem Header="View Metadata..." Command="{Binding ViewMetadataCommand}"
+                                      CommandParameter="{Binding SelectedObject}"/>
+                            <MenuItem Header="Manage Tags..." Command="{Binding ManageTagsCommand}"
+                                      CommandParameter="{Binding SelectedObject}"/>
+                            <MenuItem Header="Manage ACL..." Command="{Binding ManageAclCommand}"
+                                      CommandParameter="{Binding SelectedObject}"/>
+                            <Separator/>
+                            <MenuItem Header="Delete" Command="{Binding DeleteObjectCommand}"
+                                      CommandParameter="{Binding SelectedObject}"/>
+                            <Separator/>
+                            <MenuItem Header="Refresh" Command="{Binding RefreshCommand}"/>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Name" Width="3*" SortMemberPath="DisplayName">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="4,0">
+                                        <PathIcon Data="{StaticResource IconFolder}" Width="14" Height="14"
+                                                  IsVisible="{Binding IsPrefix}"
+                                                  Foreground="#E6A817"/>
+                                        <PathIcon Data="{StaticResource IconFile}" Width="14" Height="14"
+                                                  IsVisible="{Binding !IsPrefix}"
+                                                  Opacity="0.6"/>
+                                        <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Size" Binding="{Binding FormattedSize}" Width="*"/>
+                        <DataGridTextColumn Header="Last Modified" Binding="{Binding FormattedDate}" Width="1.5*"/>
+                        <DataGridTextColumn Header="Storage Class" Binding="{Binding StorageClass}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+            </Grid>
+
+            <!-- Activity Log Splitter -->
+            <GridSplitter Grid.Row="1" Height="4" ResizeDirection="Rows"
+                          Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"/>
+
+            <!-- Activity Log -->
+            <Border Grid.Row="2" BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="0,1,0,0">
+                <DockPanel>
+                    <Border DockPanel.Dock="Top" Padding="8,4"
+                            Background="{DynamicResource SystemControlBackgroundBaseLowBrush}">
+                        <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                            <TextBlock Text="Activity Log" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <Button Grid.Column="1" Command="{Binding ClearActivityLogCommand}"
+                                    Padding="6,2" FontSize="11" Margin="0,0,4,0"
+                                    ToolTip.Tip="Clear activity log">
+                                <StackPanel Orientation="Horizontal" Spacing="3">
+                                    <PathIcon Data="{StaticResource IconClear}" Width="11" Height="11"/>
+                                    <TextBlock Text="Clear" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="2" Command="{Binding CopyActivityLogCommand}"
+                                    Padding="6,2" FontSize="11" Margin="0,0,8,0"
+                                    ToolTip.Tip="Copy entire activity log to clipboard">
+                                <StackPanel Orientation="Horizontal" Spacing="3">
+                                    <PathIcon Data="{StaticResource IconCopy}" Width="11" Height="11"/>
+                                    <TextBlock Text="Copy All" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <TextBlock Grid.Column="3" Text="{Binding StatusText}"
+                                       VerticalAlignment="Center" Opacity="0.7"/>
+                        </Grid>
+                    </Border>
+                    <ListBox ItemsSource="{Binding ActivityLog}"
+                             x:Name="ActivityLogList"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="4,1"/>
+                                <Setter Property="MinHeight" Value="0"/>
+                            </Style>
+                        </ListBox.Styles>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <SelectableTextBlock Text="{Binding Display}" FontFamily="Consolas,Courier New,monospace"
+                                                     FontSize="12"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </DockPanel>
+</Window>

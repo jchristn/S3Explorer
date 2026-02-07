@@ -1,0 +1,28 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="S3Explorer.Views.ConfirmDialog"
+        Width="400" Height="170"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+
+    <DockPanel Margin="16">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
+            <Button Width="80" Click="OnYes" Classes="accent">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <PathIcon Data="{StaticResource IconCheck}" Width="14" Height="14"/>
+                    <TextBlock Text="Yes" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Button Width="80" Click="OnNo">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <PathIcon Data="{StaticResource IconClose}" Width="14" Height="14"/>
+                    <TextBlock Text="No" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <TextBlock x:Name="MessageText" TextWrapping="Wrap" VerticalAlignment="Center"/>
+    </DockPanel>
+</Window>

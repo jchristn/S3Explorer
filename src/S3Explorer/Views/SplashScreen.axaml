@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="S3Explorer.Views.SplashScreen"
+        Width="400" Height="320"
+        CanResize="False"
+        SystemDecorations="None"
+        WindowStartupLocation="CenterScreen"
+        Icon="/assets/icon.ico"
+        Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+
+    <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+            BorderThickness="1" CornerRadius="4">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+            <Image Source="/assets/logo-dark-text.png"
+                   Height="220"
+                   HorizontalAlignment="Center"
+                   x:Name="LightThemeLogo"/>
+            <Image Source="/assets/logo-light-text.png"
+                   Height="220"
+                   HorizontalAlignment="Center"
+                   IsVisible="False"
+                   x:Name="DarkThemeLogo"/>
+            <TextBlock Text="(c) 2026 Joel Christner"
+                       FontSize="14"
+                       HorizontalAlignment="Center"
+                       Opacity="0.7"
+                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
+        </StackPanel>
+    </Border>
+</Window>

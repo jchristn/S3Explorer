@@ -1,0 +1,58 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="S3Explorer.Views.AccountEditorDialog"
+        Title="Account Settings"
+        Width="480" Height="530"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+
+    <DockPanel Margin="16">
+        <!-- Buttons -->
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Spacing="8" Margin="0,16,0,0">
+            <Button Width="80" Click="OnSave" Classes="accent">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <PathIcon Data="{StaticResource IconSave}" Width="14" Height="14"/>
+                    <TextBlock Text="Save" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Button Width="80" Click="OnCancel">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <PathIcon Data="{StaticResource IconClose}" Width="14" Height="14"/>
+                    <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <!-- Form -->
+        <ScrollViewer>
+            <StackPanel Spacing="12">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Display Name"/>
+                    <TextBox x:Name="DisplayNameBox" Watermark="e.g. My AWS Account"/>
+                </StackPanel>
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Service URL (leave empty for AWS S3)"/>
+                    <TextBox x:Name="ServiceUrlBox" Watermark="e.g. s3.amazonaws.com or minio.local:9000"/>
+                </StackPanel>
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Access Key"/>
+                    <TextBox x:Name="AccessKeyBox" Watermark="Access Key ID"/>
+                </StackPanel>
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Secret Key"/>
+                    <TextBox x:Name="SecretKeyBox" Watermark="Secret Access Key"
+                             PasswordChar="*" RevealPassword="False"/>
+                </StackPanel>
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Region"/>
+                    <TextBox x:Name="RegionBox" Watermark="us-east-1"/>
+                </StackPanel>
+                <CheckBox x:Name="ForcePathStyleBox" Content="Force Path Style (required for most S3-compatible services)"
+                          IsChecked="True"/>
+                <CheckBox x:Name="UseSSLBox" Content="Use SSL (HTTPS)" IsChecked="True"/>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>
