@@ -6,9 +6,13 @@
 
 A cross-platform desktop application for browsing and managing Amazon S3 and S3-compatible object storage. Built with [Avalonia UI](https://avaloniaui.net/) and .NET 8.
 
+<p align="center">
+  <img src="src/S3Explorer/assets/screenshot1.png" alt="S3 Explorer Screenshot"/>
+</p>
+
 ## Features
 
-- **Account Management** - Add, edit, and remove S3 accounts; supports AWS S3 and S3-compatible services (MinIO, Wasabi, etc.)
+- **Account Management** - Add, edit, and remove S3 accounts; supports AWS S3 and S3-compatible services (Less3, MinIO, Wasabi, etc.)
 - **Bucket Operations** - Create, delete, and browse buckets
 - **Object Management** - Upload files and directories, download objects, create directories, and delete objects
 - **Drag and Drop** - Drag files from your file manager into the app to upload, or drag objects out to download
@@ -17,10 +21,6 @@ A cross-platform desktop application for browsing and managing Amazon S3 and S3-
 - **Activity Log** - Real-time logging with upload/download progress tracking
 - **Dark/Light Theme** - Toggle between dark and light modes
 - **Cross-Platform** - Runs on Windows, macOS, and Linux
-
-## Screenshots
-
-*Coming soon*
 
 ## Prerequisites
 
