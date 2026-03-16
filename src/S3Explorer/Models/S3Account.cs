@@ -8,7 +8,7 @@ public class S3Account
     public string AccessKey { get; set; } = "";
     public string SecretKey { get; set; } = "";
     public string Region { get; set; } = "us-east-1";
-    public bool ForcePathStyle { get; set; } = true;
+    public bool ForcePathStyle { get; set; } = false;
     public bool UseSSL { get; set; } = true;
 
     public override string ToString() => DisplayName;

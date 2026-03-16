@@ -5,5 +5,5 @@ if %errorlevel% neq 0 (
     popd
     exit /b %errorlevel%
 )
-dotnet run
+start "" dotnet run --no-build
 popd

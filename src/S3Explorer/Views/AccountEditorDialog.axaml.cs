@@ -72,7 +72,7 @@ public partial class AccountEditorDialog : Window
             AccessKey = AccessKeyBox.Text!.Trim(),
             SecretKey = SecretKeyBox.Text!.Trim(),
             Region = string.IsNullOrWhiteSpace(RegionBox.Text) ? "us-east-1" : RegionBox.Text.Trim(),
-            ForcePathStyle = ForcePathStyleBox.IsChecked ?? true,
+            ForcePathStyle = ForcePathStyleBox.IsChecked ?? false,
             UseSSL = UseSSLBox.IsChecked ?? true
         };
 
