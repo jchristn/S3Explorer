@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>s3explorer</id>
+    <version>1.0.0</version>
+    <title>S3 Explorer</title>
+    <authors>Joel Christner</authors>
+    <owners>Joel Christner</owners>
+    <projectUrl>https://github.com/jchristn/S3Explorer</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/jchristn/S3Explorer/main/src/S3Explorer/assets/icon.png</iconUrl>
+    <licenseUrl>https://github.com/jchristn/S3Explorer/blob/main/LICENSE.md</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A cross-platform desktop application for browsing and managing Amazon S3 and S3-compatible object storage. Features include account management, bucket operations, file upload/download with drag-and-drop, metadata/tag/ACL editing, breadcrumb navigation, activity logging, and dark/light theme support.</description>
+    <summary>Desktop client for Amazon S3 and S3-compatible object storage</summary>
+    <tags>s3 aws amazon storage object-storage desktop avalonia</tags>
+    <copyright>Copyright (c) 2026 Joel Christner</copyright>
+    <releaseNotes>Initial release.</releaseNotes>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
