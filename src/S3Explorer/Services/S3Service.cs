@@ -19,16 +19,28 @@ public class S3Service : IDisposable
             ForcePathStyle = account.ForcePathStyle,
         };
 
-        if (!string.IsNullOrWhiteSpace(account.ServiceUrl))
-        {
-            var scheme = account.UseSSL ? "https" : "http";
-            var url = account.ServiceUrl;
-            if (!url.StartsWith("http://") && !url.StartsWith("https://"))
-                url = $"{scheme}://{url}";
-            config.ServiceURL = url;
-        }
+        var serviceUrl = BuildServiceUrl(account);
+        if (serviceUrl != null)
+            config.ServiceURL = serviceUrl;
 
         _client = new AmazonS3Client(credentials, config);
+    }
+
+    /// <summary>
+    /// Builds the effective S3 service URL for an account, applying the account's
+    /// SSL preference when the configured URL omits a scheme. Returns <c>null</c>
+    /// when no custom service URL is configured (i.e. use the AWS default endpoint).
+    /// </summary>
+    internal static string? BuildServiceUrl(S3Account account)
+    {
+        if (string.IsNullOrWhiteSpace(account.ServiceUrl))
+            return null;
+
+        var scheme = account.UseSSL ? "https" : "http";
+        var url = account.ServiceUrl;
+        if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+            url = $"{scheme}://{url}";
+        return url;
     }
 
     public async Task<List<string>> ListBucketsAsync()
@@ -39,8 +51,8 @@ public class S3Service : IDisposable
 
     public async Task<List<S3ObjectItem>> ListObjectsAsync(string bucket, string prefix = "")
     {
-        var items = new List<S3ObjectItem>();
-        var seenPrefixes = new HashSet<string>();
+        var commonPrefixes = new List<string>();
+        var objects = new List<RawS3Object>();
         var request = new ListObjectsV2Request
         {
             BucketName = bucket,
@@ -54,60 +66,100 @@ public class S3Service : IDisposable
             response = await _client.ListObjectsV2Async(request);
 
             if (response.CommonPrefixes != null)
-            foreach (var commonPrefix in response.CommonPrefixes)
-            {
-                if (commonPrefix == prefix) continue;
-
-                // Normalize to one level deep from current prefix.
-                // Some S3-compatible servers return deeply nested prefixes
-                // (e.g. "test/test2/test3/") instead of just "test/".
-                var relative = commonPrefix;
-                if (!string.IsNullOrEmpty(prefix) && relative.StartsWith(prefix))
-                    relative = relative[prefix.Length..];
-                var slashIndex = relative.IndexOf('/');
-                if (slashIndex >= 0)
-                    relative = relative[..(slashIndex + 1)];
-                var normalizedKey = prefix + relative;
-
-                if (!seenPrefixes.Add(normalizedKey)) continue;
-
-                var displayName = relative.TrimEnd('/');
-                if (string.IsNullOrEmpty(displayName)) continue;
-
-                items.Add(new S3ObjectItem
-                {
-                    Key = normalizedKey,
-                    DisplayName = displayName + "/",
-                    IsPrefix = true
-                });
-            }
+                commonPrefixes.AddRange(response.CommonPrefixes);
 
             if (response.S3Objects != null)
-            foreach (var obj in response.S3Objects)
-            {
-                if (obj.Key == prefix) continue;
-                if (obj.Key.EndsWith("/")) continue;
-
-                var displayName = obj.Key;
-                if (displayName.Contains('/'))
-                    displayName = displayName[(displayName.LastIndexOf('/') + 1)..];
-
-                if (string.IsNullOrEmpty(displayName)) continue;
-
-                items.Add(new S3ObjectItem
-                {
-                    Key = obj.Key,
-                    DisplayName = displayName,
-                    Size = obj.Size ?? 0,
-                    LastModified = obj.LastModified,
-                    StorageClass = obj.StorageClass?.Value ?? "",
-                    ETag = obj.ETag ?? "",
-                    IsPrefix = false
-                });
-            }
+                foreach (var obj in response.S3Objects)
+                    objects.Add(new RawS3Object(
+                        obj.Key,
+                        obj.Size ?? 0,
+                        obj.LastModified,
+                        obj.StorageClass?.Value,
+                        obj.ETag));
 
             request.ContinuationToken = response.NextContinuationToken;
         } while (response.IsTruncated == true);
+
+        return BuildListing(prefix, commonPrefixes, objects);
+    }
+
+    /// <summary>
+    /// A minimal, SDK-agnostic projection of an S3 object used by
+    /// <see cref="BuildListing"/> so the listing normalization logic can be
+    /// exercised without a live S3 client.
+    /// </summary>
+    internal readonly record struct RawS3Object(
+        string Key,
+        long Size,
+        DateTime? LastModified,
+        string? StorageClass,
+        string? ETag);
+
+    /// <summary>
+    /// Normalizes a raw S3 listing (common prefixes + objects) for a given prefix
+    /// into the display model. Collapses deeply nested common prefixes to a single
+    /// level below the current prefix, de-duplicates prefixes, drops the current
+    /// prefix placeholder and folder-marker objects, and sorts folders first then
+    /// alphabetically by display name.
+    /// </summary>
+    internal static List<S3ObjectItem> BuildListing(
+        string prefix,
+        IEnumerable<string> commonPrefixes,
+        IEnumerable<RawS3Object> objects)
+    {
+        var items = new List<S3ObjectItem>();
+        var seenPrefixes = new HashSet<string>();
+
+        foreach (var commonPrefix in commonPrefixes)
+        {
+            if (commonPrefix == prefix) continue;
+
+            // Normalize to one level deep from current prefix.
+            // Some S3-compatible servers return deeply nested prefixes
+            // (e.g. "test/test2/test3/") instead of just "test/".
+            var relative = commonPrefix;
+            if (!string.IsNullOrEmpty(prefix) && relative.StartsWith(prefix))
+                relative = relative[prefix.Length..];
+            var slashIndex = relative.IndexOf('/');
+            if (slashIndex >= 0)
+                relative = relative[..(slashIndex + 1)];
+            var normalizedKey = prefix + relative;
+
+            if (!seenPrefixes.Add(normalizedKey)) continue;
+
+            var displayName = relative.TrimEnd('/');
+            if (string.IsNullOrEmpty(displayName)) continue;
+
+            items.Add(new S3ObjectItem
+            {
+                Key = normalizedKey,
+                DisplayName = displayName + "/",
+                IsPrefix = true
+            });
+        }
+
+        foreach (var obj in objects)
+        {
+            if (obj.Key == prefix) continue;
+            if (obj.Key.EndsWith("/")) continue;
+
+            var displayName = obj.Key;
+            if (displayName.Contains('/'))
+                displayName = displayName[(displayName.LastIndexOf('/') + 1)..];
+
+            if (string.IsNullOrEmpty(displayName)) continue;
+
+            items.Add(new S3ObjectItem
+            {
+                Key = obj.Key,
+                DisplayName = displayName,
+                Size = obj.Size,
+                LastModified = obj.LastModified,
+                StorageClass = obj.StorageClass ?? "",
+                ETag = obj.ETag ?? "",
+                IsPrefix = false
+            });
+        }
 
         return items.OrderByDescending(i => i.IsPrefix).ThenBy(i => i.DisplayName).ToList();
     }

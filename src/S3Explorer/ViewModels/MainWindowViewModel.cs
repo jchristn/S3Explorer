@@ -190,20 +190,48 @@ public partial class MainWindowViewModel : ViewModelBase
     private void UpdateBreadcrumbs()
     {
         Breadcrumbs.Clear();
-        if (SelectedBucket == null) return;
+        foreach (var segment in BuildBreadcrumbs(SelectedBucket, CurrentPrefix))
+            Breadcrumbs.Add(segment);
+    }
 
-        Breadcrumbs.Add(new BreadcrumbSegment { Label = SelectedBucket, Prefix = "" });
+    /// <summary>
+    /// Builds the breadcrumb trail for a bucket and prefix. Returns an empty list
+    /// when no bucket is selected; otherwise the first segment is the bucket root
+    /// (empty prefix) followed by one segment per path part with an accumulated,
+    /// slash-terminated prefix.
+    /// </summary>
+    internal static List<BreadcrumbSegment> BuildBreadcrumbs(string? bucket, string currentPrefix)
+    {
+        var breadcrumbs = new List<BreadcrumbSegment>();
+        if (bucket == null) return breadcrumbs;
 
-        if (!string.IsNullOrEmpty(CurrentPrefix))
+        breadcrumbs.Add(new BreadcrumbSegment { Label = bucket, Prefix = "" });
+
+        if (!string.IsNullOrEmpty(currentPrefix))
         {
-            var parts = CurrentPrefix.TrimEnd('/').Split('/');
+            var parts = currentPrefix.TrimEnd('/').Split('/');
             var accumulated = "";
             foreach (var part in parts)
             {
                 accumulated += part + "/";
-                Breadcrumbs.Add(new BreadcrumbSegment { Label = part, Prefix = accumulated });
+                breadcrumbs.Add(new BreadcrumbSegment { Label = part, Prefix = accumulated });
             }
         }
+
+        return breadcrumbs;
+    }
+
+    /// <summary>
+    /// Computes the parent prefix one level up from <paramref name="currentPrefix"/>.
+    /// Returns an empty string when already at the root or when there is no parent.
+    /// </summary>
+    internal static string ComputeParentPrefix(string currentPrefix)
+    {
+        if (string.IsNullOrEmpty(currentPrefix)) return "";
+
+        var trimmed = currentPrefix.TrimEnd('/');
+        var lastSlash = trimmed.LastIndexOf('/');
+        return lastSlash >= 0 ? trimmed[..(lastSlash + 1)] : "";
     }
 
     [RelayCommand]
@@ -242,9 +270,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (string.IsNullOrEmpty(CurrentPrefix)) return;
 
-        var trimmed = CurrentPrefix.TrimEnd('/');
-        var lastSlash = trimmed.LastIndexOf('/');
-        CurrentPrefix = lastSlash >= 0 ? trimmed[..(lastSlash + 1)] : "";
+        CurrentPrefix = ComputeParentPrefix(CurrentPrefix);
         await LoadObjectsAsync();
     }
 
