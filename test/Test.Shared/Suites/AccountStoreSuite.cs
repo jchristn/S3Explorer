@@ -51,6 +51,48 @@ public static class AccountStoreSuite
                     Check.Equal("us-west-2", reader.Accounts[0].Region);
                 })),
 
+            Case(Id, "roundtrip-all-fields", "Every account field survives a save/load round-trip", () =>
+                WithTempDir(dir =>
+                {
+                    var account = new S3Account
+                    {
+                        DisplayName = "Full",
+                        ServiceUrl = "minio.local:9000",
+                        AccessKey = "AKIAEXAMPLE",
+                        SecretKey = "s3cr3t/Key+Value",
+                        Region = "eu-central-1",
+                        ForcePathStyle = true, // non-default
+                        UseSSL = false,        // non-default
+                    };
+
+                    var writer = new AccountStore(dir);
+                    writer.AddOrUpdate(account);
+
+                    var reader = new AccountStore(dir);
+                    reader.Load();
+                    Check.Count(1, reader.Accounts);
+                    var loaded = reader.Accounts[0];
+                    Check.Equal(account.Id, loaded.Id);
+                    Check.Equal("Full", loaded.DisplayName);
+                    Check.Equal("minio.local:9000", loaded.ServiceUrl);
+                    Check.Equal("AKIAEXAMPLE", loaded.AccessKey);
+                    Check.Equal("s3cr3t/Key+Value", loaded.SecretKey);
+                    Check.Equal("eu-central-1", loaded.Region);
+                    Check.True(loaded.ForcePathStyle, "ForcePathStyle should persist as true");
+                    Check.False(loaded.UseSSL, "UseSSL should persist as false");
+                })),
+
+            Case(Id, "empty-file", "An empty config file recovers to an empty list", () =>
+                WithTempDir(dir =>
+                {
+                    Directory.CreateDirectory(dir);
+                    File.WriteAllText(Path.Combine(dir, "accounts.json"), "");
+
+                    var store = new AccountStore(dir);
+                    store.Load();
+                    Check.Empty(store.Accounts);
+                })),
+
             Case(Id, "corrupt-json", "Corrupt config file recovers to an empty list", () =>
                 WithTempDir(dir =>
                 {

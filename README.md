@@ -80,9 +80,9 @@ Account credentials are stored locally at:
 
 ## Dependencies
 
-- [Avalonia UI](https://avaloniaui.net/) 11.3.11 - Cross-platform UI framework
-- [CommunityToolkit.Mvvm](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/) 8.4.0 - MVVM toolkit
-- [AWS SDK for .NET (S3)](https://aws.amazon.com/sdk-for-net/) 4.0.18.2 - Amazon S3 client
+- [Avalonia UI](https://avaloniaui.net/) 12.1.1 - Cross-platform UI framework
+- [CommunityToolkit.Mvvm](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/) 8.4.2 - MVVM toolkit
+- [AWS SDK for .NET (S3)](https://aws.amazon.com/sdk-for-net/) 4.0.102.1 - Amazon S3 client
 
 ## License
 

@@ -30,24 +30,24 @@
             <StackPanel Spacing="12">
                 <StackPanel Spacing="4">
                     <TextBlock Text="Display Name"/>
-                    <TextBox x:Name="DisplayNameBox" Watermark="e.g. My AWS Account"/>
+                    <TextBox x:Name="DisplayNameBox" PlaceholderText="e.g. My AWS Account"/>
                 </StackPanel>
                 <StackPanel Spacing="4">
                     <TextBlock Text="Service URL (leave empty for AWS S3)"/>
-                    <TextBox x:Name="ServiceUrlBox" Watermark="e.g. s3.amazonaws.com or minio.local:9000"/>
+                    <TextBox x:Name="ServiceUrlBox" PlaceholderText="e.g. s3.amazonaws.com or minio.local:9000"/>
                 </StackPanel>
                 <StackPanel Spacing="4">
                     <TextBlock Text="Access Key"/>
-                    <TextBox x:Name="AccessKeyBox" Watermark="Access Key ID"/>
+                    <TextBox x:Name="AccessKeyBox" PlaceholderText="Access Key ID"/>
                 </StackPanel>
                 <StackPanel Spacing="4">
                     <TextBlock Text="Secret Key"/>
-                    <TextBox x:Name="SecretKeyBox" Watermark="Secret Access Key"
+                    <TextBox x:Name="SecretKeyBox" PlaceholderText="Secret Access Key"
                              PasswordChar="*" RevealPassword="False"/>
                 </StackPanel>
                 <StackPanel Spacing="4">
                     <TextBlock Text="Region"/>
-                    <TextBox x:Name="RegionBox" Watermark="us-east-1"/>
+                    <TextBox x:Name="RegionBox" PlaceholderText="us-east-1"/>
                 </StackPanel>
                 <CheckBox x:Name="ForcePathStyleBox" Content="Force Path Style (required for most S3-compatible services)"
                           IsChecked="False"/>

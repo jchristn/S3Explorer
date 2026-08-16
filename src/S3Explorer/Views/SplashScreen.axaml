@@ -3,7 +3,7 @@
         x:Class="S3Explorer.Views.SplashScreen"
         Width="400" Height="320"
         CanResize="False"
-        SystemDecorations="None"
+        WindowDecorations="None"
         WindowStartupLocation="CenterScreen"
         Icon="/assets/icon.ico"
         Background="{DynamicResource SystemControlBackgroundAltHighBrush}">

@@ -26,8 +26,8 @@
 
         <!-- Add Tag Row -->
         <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,8,*,8,Auto" Margin="0,8,0,0">
-            <TextBox Grid.Column="0" x:Name="NewKeyBox" Watermark="Key"/>
-            <TextBox Grid.Column="2" x:Name="NewValueBox" Watermark="Value"/>
+            <TextBox Grid.Column="0" x:Name="NewKeyBox" PlaceholderText="Key"/>
+            <TextBox Grid.Column="2" x:Name="NewValueBox" PlaceholderText="Value"/>
             <Button Grid.Column="4" Click="OnAddTag">
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <PathIcon Data="{StaticResource IconAdd}" Width="14" Height="14"/>

@@ -82,6 +82,44 @@ public static class ProgressStreamSuite
                 Check.Equal(6L, last);
             }),
 
+            // The Memory<byte> ReadAsync overload is the one the download path uses
+            // (Stream.ReadAsync(Memory<byte>)); it must still surface cumulative progress
+            // even though ProgressStream only overrides the array-based overload.
+            AsyncCase(Id, "read-async-memory-reports-cumulative", "ReadAsync(Memory<byte>) reports cumulative bytes read", async () =>
+            {
+                using var inner = Data(6);
+                long last = -1;
+                using var ps = new ProgressStream(inner, total => last = total);
+
+                var buffer = new byte[4];
+                Check.Equal(4, await ps.ReadAsync(buffer.AsMemory(0, 4)));
+                Check.Equal(4L, last);
+                Check.Equal(2, await ps.ReadAsync(buffer.AsMemory(0, 4)));
+                Check.Equal(6L, last);
+                // Reading past the end reports 0 and leaves the total unchanged.
+                Check.Equal(0, await ps.ReadAsync(buffer.AsMemory(0, 4)));
+                Check.Equal(6L, last);
+            }),
+
+            // Reads into a non-zero buffer offset must still count only the bytes read.
+            Case(Id, "read-honors-offset", "Read into a non-zero buffer offset reports bytes read", () =>
+            {
+                using var inner = Data(5);
+                long last = -1;
+                using var ps = new ProgressStream(inner, total => last = total);
+
+                var buffer = new byte[10];
+                // Data(5) yields bytes [0,1,2,3,4]; read the first three into offset 4.
+                Check.Equal(3, ps.Read(buffer, 4, 3));
+                Check.Equal(3L, last);
+                // Bytes landed at the requested offset (buffer[4..6] = 0,1,2)...
+                Check.Equal((byte)1, buffer[5]);
+                Check.Equal((byte)2, buffer[6]);
+                // ...and nothing was written before the offset or past the count.
+                Check.Equal((byte)0, buffer[3]);
+                Check.Equal((byte)0, buffer[7]);
+            }),
+
             Case(Id, "seek-delegates", "Seek delegates to inner and moves position", () =>
             {
                 using var inner = Data(50);

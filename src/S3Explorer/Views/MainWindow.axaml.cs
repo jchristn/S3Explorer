@@ -5,14 +5,13 @@ using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using S3Explorer.ViewModels;
 
-#pragma warning disable CS0618 // Avalonia DragDrop API deprecations
-
 namespace S3Explorer.Views;
 
 public partial class MainWindow : Window
 {
     private Point _dragStartPoint;
     private bool _isDragInProgress;
+    private PointerPressedEventArgs? _pointerPressedArgs;
 
     public MainWindow()
     {
@@ -59,7 +58,7 @@ public partial class MainWindow : Window
 
     private void OnDragOver(object? sender, DragEventArgs e)
     {
-        e.DragEffects = e.Data.Contains(DataFormats.Files)
+        e.DragEffects = e.DataTransfer is { } data && data.Contains(DataFormat.File)
             ? DragDropEffects.Copy
             : DragDropEffects.None;
     }
@@ -67,9 +66,9 @@ public partial class MainWindow : Window
     private async void OnDrop(object? sender, DragEventArgs e)
     {
         if (DataContext is not MainWindowViewModel vm) return;
-        if (!e.Data.Contains(DataFormats.Files)) return;
+        if (e.DataTransfer is not { } data || !data.Contains(DataFormat.File)) return;
 
-        var items = e.Data.GetFiles();
+        var items = data.TryGetFiles();
         if (items == null) return;
 
         var paths = new List<string>();
@@ -92,6 +91,7 @@ public partial class MainWindow : Window
         {
             _dragStartPoint = e.GetPosition(this);
             _isDragInProgress = false;
+            _pointerPressedArgs = e;
         }
     }
 
@@ -125,10 +125,11 @@ public partial class MainWindow : Window
 
             var storageFile = await StorageProvider.TryGetFileFromPathAsync(new Uri("file:///" + tempPath.Replace('\\', '/')));
             if (storageFile == null) return;
+            if (_pointerPressedArgs == null) return;
 
-            var data = new DataObject();
-            data.Set(DataFormats.Files, new[] { storageFile });
-            await DragDrop.DoDragDrop(e, data, DragDropEffects.Copy);
+            using var data = new DataTransfer();
+            data.Add(DataTransferItem.CreateFile(storageFile));
+            await DragDrop.DoDragDropAsync(_pointerPressedArgs, data, DragDropEffects.Copy);
         }
         finally
         {
