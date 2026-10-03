@@ -21,7 +21,7 @@
 #>
 
 param(
-    [string]$Version = "1.0.0",
+    [string]$Version = "1.0.1",
     [switch]$SkipPublish,
     [switch]$SkipInstaller,
     [switch]$SkipChoco

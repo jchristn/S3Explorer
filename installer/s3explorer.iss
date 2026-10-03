@@ -2,7 +2,7 @@
 ; Requires Inno Setup 6.x (https://jrsoftware.org/isinfo.php)
 
 #define MyAppName "S3 Explorer"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "Joel Christner"
 #define MyAppURL "https://github.com/jchristn/S3Explorer"
 #define MyAppExeName "S3Explorer.exe"
